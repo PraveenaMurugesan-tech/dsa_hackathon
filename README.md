@@ -16,9 +16,10 @@ Find the shortest path through a maze containing walls, keys, and locked doors u
 
 #### Build and run
 
-From the repository root, compile and run the Java implementation:
+From the repository root, enter the maze project folder, then compile and run:
 
 ```text
+cd Problem1_Maze_Keys_Doors
 javac *.java
 java Main
 ```
@@ -45,7 +46,7 @@ To generate a random 25 × 25 maze with a repeatable seed:
 echo "4 2 25" | java Main --seed=42 --no-gui
 ```
 
-The shortest path length (or `-1` if no solution exists) is printed to standard output. The route is saved to `maze_solution.csv`; generated mazes are saved to `maze_generated.csv`.
+The shortest path length (or `-1` if no solution exists) is printed to standard output. The route is saved to `maze_solution.csv`; generated mazes are saved to `maze_generated.csv` in `Problem1_Maze_Keys_Doors`.
 
 Run the Java self-tests with:
 
@@ -82,14 +83,7 @@ Schedule exams without conflicts while respecting hall capacity, using greedy gr
 
 ```text
 .
-├── Main.java
-├── Maze.java
-├── MazeGenerator.java
-├── MazeSolver.java
-├── MazeTests.java
-├── MazeVisualizer.java
-├── CsvUtil.java
-├── sample_maze.csv
+├── Problem1_Maze_Keys_Doors/
 └── problem_2/
 ```
 
