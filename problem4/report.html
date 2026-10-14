@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exam timetable report</title>
+<style>
+:root{--bg:#eef1f5;--ink:#16202e;--mute:#5d6b7e;--line:#cdd5e0;--panel:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+main{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:17px;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 20px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:18px}
+.row,.charts{display:grid;gap:18px}
+.row{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.charts{grid-template-columns:1fr 1fr}
+@media(max-width:900px){.row,.charts{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line)}
+.grid td,.grid th{text-align:center;border:1px solid var(--line);min-width:44px;height:34px;padding:2px 6px}
+.grid th.s{text-align:left;white-space:nowrap}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button,select{font:inherit;padding:5px 12px;border:1px solid var(--line);background:#fff;border-radius:4px;cursor:pointer;color:var(--ink)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #2f5fd0;outline-offset:2px}
+.wrap{overflow:auto;max-height:640px}
+#status{color:var(--mute);min-height:1.5em;margin-top:8px}
+svg text{font-family:inherit}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body><main>
+<h1>Exam timetable</h1>
+<p class="sub" id="sub"></p>
+
+<div class="panel"><h2>Algorithm comparison</h2><div class="wrap"><table id="summary"></table></div></div>
+
+<div class="panel">
+  <h2>View and replay an algorithm's assignment order</h2>
+  <div class="ctl">
+    <label for="alg">Algorithm</label><select id="alg"></select>
+    <button id="play">Play</button><button id="step">Step</button><button id="reset">Show all</button>
+    <label for="speed">Delay</label><input id="speed" type="range" min="10" max="800" value="150">
+  </div>
+  <div id="status"></div>
+</div>
+
+<div class="row">
+  <div class="panel"><h2>Conflict graph</h2><svg id="graph" viewBox="0 0 800 800" width="100%" role="img" aria-label="Conflict graph coloured by slot"></svg></div>
+  <div class="panel"><h2>Timetable grid</h2><div class="wrap" id="tt"></div></div>
+</div>
+
+<div class="charts">
+  <div class="panel"><h2>Slots used as N grows</h2><div id="c1"></div></div>
+  <div class="panel"><h2>Running time (ms, log scale) as N grows</h2><div id="c2"></div></div>
+</div>
+</main>
+<script>
+window.DATA = {"n":40,"R":6,"base":1,"lb":7,"m":160,"pos":[[0.6949,0.2403],[0.6953,0.5054],[0.3951,0.8899],[0.8699,0.0400],[0.2239,0.7750],[0.8686,0.7838],[0.9387,0.7034],[0.9161,0.5373],[0.3165,0.7412],[0.4505,0.7533],[0.3775,0.5983],[0.6079,0.6991],[0.2653,0.5896],[0.2198,0.0733],[0.1882,0.4419],[0.4941,0.6524],[0.1953,0.8756],[0.9482,0.1465],[0.1533,0.6745],[0.5900,0.4954],[0.5105,0.9006],[0.6818,0.3690],[0.7066,0.8084],[0.1949,0.6228],[0.5090,0.8136],[0.3180,0.2991],[0.8209,0.4350],[0.4064,0.5109],[0.4677,0.2279],[0.0400,0.4530],[0.7476,0.6548],[0.3225,0.4496],[0.5112,0.5317],[0.5943,0.9600],[0.4685,0.4079],[0.9600,0.4550],[0.7202,0.0786],[0.6335,0.6154],[0.5879,0.1920],[0.5989,0.7880]],"edges":[[0,15],[0,17],[0,19],[0,25],[1,5],[1,9],[1,10],[1,25],[1,32],[1,34],[1,35],[2,9],[2,18],[2,20],[2,22],[2,23],[2,24],[2,30],[2,37],[3,28],[3,35],[3,38],[4,9],[4,10],[4,11],[4,12],[4,18],[4,20],[4,34],[5,11],[5,15],[5,20],[5,22],[5,30],[5,35],[6,11],[6,19],[6,22],[6,35],[6,37],[6,39],[7,30],[7,32],[7,34],[7,35],[7,37],[8,9],[8,12],[8,15],[8,16],[8,19],[8,23],[8,31],[8,32],[8,33],[9,10],[9,12],[9,15],[9,19],[9,22],[9,32],[9,33],[9,39],[10,15],[10,19],[10,24],[10,27],[10,28],[10,29],[10,31],[10,33],[10,34],[11,12],[11,19],[11,20],[11,23],[11,24],[11,27],[11,30],[11,35],[12,16],[12,24],[12,29],[12,31],[12,38],[13,14],[13,25],[13,28],[13,38],[14,16],[14,18],[14,23],[14,28],[14,31],[14,32],[14,37],[15,18],[15,20],[15,24],[15,27],[15,31],[15,39],[16,20],[16,22],[17,21],[17,35],[17,36],[17,38],[18,27],[18,29],[18,34],[18,39],[19,21],[19,24],[19,25],[19,26],[19,28],[19,34],[20,32],[20,37],[21,22],[21,26],[21,27],[21,28],[21,31],[21,32],[22,24],[22,26],[22,33],[23,25],[23,27],[23,29],[23,39],[24,30],[25,27],[25,28],[25,29],[25,31],[26,34],[26,35],[26,36],[26,39],[27,30],[27,31],[27,37],[28,32],[28,34],[28,36],[29,34],[30,33],[30,35],[30,37],[30,38],[31,32],[31,37],[32,34],[32,37],[33,39],[34,36],[35,37]],"algs":[{"name":"Welsh-Powell","slots":7,"optimal":true,"ms":0.3243,"note":"","slot":[5,3,2,6,2,4,5,5,3,0,1,0,1,6,2,2,0,0,4,2,3,4,1,4,3,1,5,3,3,5,1,0,1,4,0,2,6,4,5,6],"order":[9,11,34,31,16,17,10,32,30,12,22,25,19,15,35,2,14,4,27,28,8,20,24,1,37,18,21,23,5,33,26,6,29,7,38,0,39,13,36,3]},{"name":"DSatur","slots":8,"optimal":false,"ms":0.3232,"note":"","slot":[6,4,3,7,5,3,5,5,3,0,1,1,4,5,4,2,2,5,1,2,0,4,1,2,0,1,3,3,3,5,4,0,1,2,0,0,6,2,6,4],"order":[9,10,19,15,34,28,32,8,31,21,27,37,14,18,25,2,22,26,39,33,20,16,11,12,24,30,35,5,6,7,23,29,1,4,13,17,0,36,38,3]},{"name":"DSatur multi-start","slots":7,"optimal":true,"ms":90.9604,"note":"2001 runs","slot":[6,3,4,5,4,0,5,3,4,0,2,2,1,5,4,1,6,5,2,1,5,2,1,0,0,2,3,3,3,5,1,0,1,3,0,4,6,2,6,4],"order":[9,19,10,34,28,32,1,15,31,27,37,14,18,25,21,23,11,5,30,35,26,39,33,7,8,12,22,2,20,4,24,29,6,16,13,38,17,0,36,3]},{"name":"Exact B&B","slots":7,"optimal":true,"ms":92.0721,"note":"0 nodes","slot":[5,3,2,6,2,4,5,5,3,0,1,0,1,6,2,2,0,0,4,2,3,4,1,4,3,1,5,3,3,5,1,0,1,4,0,2,6,4,5,6],"order":[9,11,34,31,16,17,10,32,30,12,22,25,19,15,35,2,14,4,27,28,8,20,24,1,37,18,21,23,5,33,26,6,29,7,38,0,39,13,36,3]}],"bench":[{"n":10,"ws":{"slots":3,"ms":0.0141},"ds":{"slots":3,"ms":0.0513},"mst":{"slots":3,"ms":13.6787},"ex":{"slots":3,"ms":13.7533,"optimal":true}},{"n":20,"ws":{"slots":4,"ms":0.0213},"ds":{"slots":4,"ms":0.0072},"mst":{"slots":4,"ms":18.8822},"ex":{"slots":4,"ms":18.9221,"optimal":true}},{"n":30,"ws":{"slots":5,"ms":2.8652},"ds":{"slots":6,"ms":0.0174},"mst":{"slots":5,"ms":51.3389},"ex":{"slots":5,"ms":54.2351,"optimal":true}},{"n":40,"ws":{"slots":8,"ms":0.0838},"ds":{"slots":8,"ms":0.0152},"mst":{"slots":7,"ms":13.3024},"ex":{"slots":7,"ms":13.4141,"optimal":true}},{"n":50,"ws":{"slots":10,"ms":0.0741},"ds":{"slots":10,"ms":0.0197},"mst":{"slots":9,"ms":31.9936},"ex":{"slots":9,"ms":32.0991,"optimal":true}},{"n":60,"ws":{"slots":11,"ms":0.0774},"ds":{"slots":11,"ms":0.0249},"mst":{"slots":10,"ms":50.0157},"ex":{"slots":10,"ms":50.1345,"optimal":true}},{"n":80,"ws":{"slots":14,"ms":0.1330},"ds":{"slots":14,"ms":0.0781},"mst":{"slots":14,"ms":50.0197},"ex":{"slots":14,"ms":50.2496,"optimal":true}},{"n":100,"ws":{"slots":17,"ms":0.1112},"ds":{"slots":17,"ms":0.0563},"mst":{"slots":17,"ms":50.0050},"ex":{"slots":17,"ms":50.1891,"optimal":true}}]};
+const D = window.DATA, NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const slotColor = i => 'hsl(' + ((i * 137.508) % 360).toFixed(1) + ',62%,62%)';
+const lab = v => v + D.base;
+let cur, idx = [], shown = 0, timer = null, nodeEls = [], cells = [];
+
+$('sub').textContent = D.n + ' courses, ' + D.m + ' conflicts, at most ' + D.R + ' exams per slot. Lower bound: ' + D.lb + ' slots.';
+
+// summary table
+let h = '<tr><th>Algorithm</th><th>Slots</th><th>Proven optimal</th><th>Time (ms)</th><th>Note</th></tr>';
+D.algs.forEach(a => {
+  h += '<tr><td>' + a.name + '</td><td>' + a.slots + '</td><td>' + (a.optimal ? 'Yes' : 'No') + '</td><td>' + a.ms.toFixed(3) + '</td><td>' + a.note + '</td></tr>';
+});
+$('summary').innerHTML = h;
+
+// graph
+const svg = $('graph');
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent || svg).appendChild(e);
+  return e;
+}
+const X = p => 20 + p[0] * 760, Y = p => 20 + p[1] * 760;
+if (D.edges.length) {
+  const g = el('g', {stroke: '#9aa6b8', 'stroke-opacity': D.n > 100 ? 0.25 : 0.55, 'stroke-width': 1});
+  D.edges.forEach(e => el('line', {x1: X(D.pos[e[0]]), y1: Y(D.pos[e[0]]), x2: X(D.pos[e[1]]), y2: Y(D.pos[e[1]])}, g));
+}
+const rad = Math.max(4, Math.min(16, 300 / Math.sqrt(Math.max(D.n, 1))));
+for (let v = 0; v < D.n; v++) {
+  const c = el('circle', {cx: X(D.pos[v]), cy: Y(D.pos[v]), r: rad, fill: '#d9dee7', stroke: '#16202e', 'stroke-width': 1});
+  const t = document.createElementNS(NS, 'title'); t.textContent = 'Course ' + lab(v); c.appendChild(t);
+  nodeEls.push(c);
+  if (D.n <= 120) {
+    const tx = el('text', {x: X(D.pos[v]), y: Y(D.pos[v]) + rad * 0.35, 'text-anchor': 'middle', 'font-size': rad * 0.95, 'pointer-events': 'none'});
+    tx.textContent = lab(v);
+  }
+}
+
+function buildTable() {
+  const K = cur.slots, lists = [];
+  for (let s = 0; s < K; s++) lists.push([]);
+  for (let v = 0; v < D.n; v++) lists[cur.slot[v]].push(v);
+  let cols = 1;
+  lists.forEach(l => { if (l.length > cols) cols = l.length; });
+  let t = '<table class="grid"><tr><th class="s">Slot</th>';
+  for (let j = 1; j <= cols; j++) t += '<th>Hall ' + j + '</th>';
+  t += '</tr>';
+  cells = [];
+  for (let s = 0; s < K; s++) {
+    t += '<tr><th class="s" style="border-left:8px solid ' + slotColor(s) + '">Slot ' + (s + 1) + '</th>';
+    for (let j = 0; j < cols; j++) {
+      const v = j < lists[s].length ? lists[s][j] : -1;
+      t += '<td id="cell' + s + '_' + j + '"></td>';
+      if (v >= 0) cells.push([s, j, v]);
+    }
+    t += '</tr>';
+  }
+  $('tt').innerHTML = t + '</table>';
+}
+
+function update() {
+  for (let v = 0; v < D.n; v++) nodeEls[v].setAttribute('fill', idx[v] < shown ? slotColor(cur.slot[v]) : '#d9dee7');
+  cells.forEach(c => {
+    const e = $('cell' + c[0] + '_' + c[1]);
+    const on = idx[c[2]] < shown;
+    e.textContent = on ? lab(c[2]) : '';
+    e.style.background = on ? slotColor(c[0]) : '';
+  });
+}
+
+function stop() { if (timer) { clearInterval(timer); timer = null; $('play').textContent = 'Play'; } }
+function step() {
+  if (shown < D.n) {
+    const v = cur.order[shown++];
+    $('status').textContent = 'Assigned course ' + lab(v) + ' to slot ' + (cur.slot[v] + 1) + ' (' + shown + ' of ' + D.n + ')';
+    update();
+  } else stop();
+}
+function choose(i) {
+  stop();
+  cur = D.algs[i];
+  idx = new Array(D.n);
+  cur.order.forEach((v, k) => idx[v] = k);
+  shown = D.n;
+  buildTable(); update();
+  $('status').textContent = cur.name + ': ' + cur.slots + ' slots' + (cur.optimal ? ' (proven optimal)' : '');
+}
+D.algs.forEach((a, i) => {
+  const o = document.createElement('option');
+  o.value = i; o.textContent = a.name + ' (' + a.slots + ' slots)';
+  $('alg').appendChild(o);
+});
+$('alg').value = D.algs.length - 1;
+$('alg').onchange = () => choose(+$('alg').value);
+$('play').onclick = () => {
+  if (timer) { stop(); return; }
+  if (shown >= D.n) { shown = 0; update(); }
+  $('play').textContent = 'Pause';
+  timer = setInterval(step, +$('speed').value);
+};
+$('speed').onchange = () => { if (timer) { clearInterval(timer); timer = setInterval(step, +$('speed').value); } };
+$('step').onclick = () => { stop(); if (shown >= D.n) { shown = 0; update(); } step(); };
+$('reset').onclick = () => { stop(); shown = D.n; update(); };
+choose(D.algs.length - 1);
+
+// charts
+function chart(host, key, log) {
+  const rows = D.bench;
+  if (!rows.length) { host.textContent = 'Benchmark was disabled (--nobench).'; return; }
+  const W = 540, H = 320, L = 58, R = 16, T = 16, B = 70;
+  const series = [['ws', 'Welsh-Powell', '#d1495b', ''], ['ds', 'DSatur', '#2e7d9a', '7 4'],
+                  ['mst', 'DSatur multi-start', '#7a5ea8', '2 3'], ['ex', 'Exact B&B', '#16202e', '']];
+  const f = v => log ? Math.log10(Math.max(v, 0.001)) : v;
+  let lo = Infinity, hi = -Infinity;
+  rows.forEach(r => series.forEach(s => { const v = f(r[s[0]][key]); lo = Math.min(lo, v); hi = Math.max(hi, v); }));
+  if (log) { lo = Math.floor(lo); hi = Math.ceil(hi); } else { lo = Math.max(0, Math.floor(lo) - 1); hi = Math.ceil(hi) + 1; }
+  if (hi <= lo) hi = lo + 1;
+  const xs = rows.map(r => r.n), xmin = Math.min(...xs), xmax = Math.max(...xs);
+  const x = n => L + (n - xmin) / ((xmax - xmin) || 1) * (W - L - R);
+  const y = v => T + (1 - (f(v) - lo) / (hi - lo)) * (H - T - B);
+  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%">';
+  for (let i = 0; i <= 5; i++) {
+    const tv = lo + (hi - lo) * i / 5, py = T + (1 - i / 5) * (H - T - B);
+    const label = log ? Math.pow(10, tv).toPrecision(2) : tv.toFixed(0);
+    s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + py + '" y2="' + py + '" stroke="#e1e6ee"/>';
+    s += '<text x="' + (L - 6) + '" y="' + (py + 4) + '" font-size="11" text-anchor="end" fill="#5d6b7e">' + label + '</text>';
+  }
+  xs.forEach(n => {
+    s += '<text x="' + x(n) + '" y="' + (H - B + 16) + '" font-size="11" text-anchor="middle" fill="#5d6b7e">' + n + '</text>';
+  });
+  s += '<text x="' + ((L + W - R) / 2) + '" y="' + (H - B + 34) + '" font-size="12" text-anchor="middle">Number of courses N</text>';
+  series.forEach(se => {
+    const pts = rows.map(r => x(r.n) + ',' + y(r[se[0]][key])).join(' ');
+    s += '<polyline fill="none" stroke="' + se[2] + '" stroke-width="2" stroke-dasharray="' + se[3] + '" points="' + pts + '"/>';
+    rows.forEach(r => {
+      const hollow = se[0] === 'ex' && !r.ex.optimal;
+      s += '<circle cx="' + x(r.n) + '" cy="' + y(r[se[0]][key]) + '" r="3.5" fill="' + (hollow ? '#fff' : se[2]) + '" stroke="' + se[2] + '"/>';
+    });
+  });
+  series.forEach((se, i) => {
+    const lx = L + (i % 2) * 220, ly = H - 26 + Math.floor(i / 2) * 16;
+    s += '<line x1="' + lx + '" x2="' + (lx + 24) + '" y1="' + ly + '" y2="' + ly + '" stroke="' + se[2] + '" stroke-width="2" stroke-dasharray="' + se[3] + '"/>';
+    s += '<text x="' + (lx + 30) + '" y="' + (ly + 4) + '" font-size="12">' + se[1] + '</text>';
+  });
+  host.innerHTML = s + '</svg>' + (key === 'slots' ? '<div style="color:#5d6b7e;font-size:13px">Hollow exact points: time limit reached, result not proven optimal.</div>' : '');
+}
+chart($('c1'), 'slots', false);
+chart($('c2'), 'ms', true);
+</script></body></html>

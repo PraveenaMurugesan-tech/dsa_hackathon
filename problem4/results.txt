@@ -1,0 +1,5 @@
+Lower bound: 7
+Welsh-Powell              7  Yes                   0.324  
+DSatur                    8  No                    0.323  
+DSatur multi-start        7  Yes                  90.960  2001 runs
+Exact B&B                 7  Yes                  92.072  0 nodes

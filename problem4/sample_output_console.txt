@@ -1,0 +1,31 @@
+Courses N=40  conflicts M=160  hall limit R=6  density=0.250
+(random graph, seed 42)
+
+Lower bound on slots: 7  (max of ceil(N/R) and clique size)
+Algorithm             Slots  Proven optimal    Time (ms)  Note
+Welsh-Powell              7  Yes                   0.324  
+DSatur                    8  No                    0.323  
+DSatur multi-start        7  Yes                  90.960  2001 runs
+Exact B&B                 7  Yes                  92.072  0 nodes
+
+Final timetable (7 slots, proven optimal):
+Slot 1: 10, 12, 17, 18, 32, 35
+Slot 2: 11, 13, 23, 26, 31, 33
+Slot 3: 3, 5, 15, 16, 20, 36
+Slot 4: 2, 9, 21, 25, 28, 29
+Slot 5: 6, 19, 22, 24, 34, 38
+Slot 6: 1, 7, 8, 27, 30, 39
+Slot 7: 4, 14, 37, 40
+
+Benchmark (density 0.25, R=6, exact limit 2.0s)...
+  N=10   WP=3   DSatur=3   Multi=3   Exact=3   (optimal, 13.8 ms)
+  N=20   WP=4   DSatur=4   Multi=4   Exact=4   (optimal, 18.9 ms)
+  N=30   WP=5   DSatur=6   Multi=5   Exact=5   (optimal, 54.2 ms)
+  N=40   WP=8   DSatur=8   Multi=7   Exact=7   (optimal, 13.4 ms)
+  N=50   WP=10  DSatur=10  Multi=9   Exact=9   (optimal, 32.1 ms)
+  N=60   WP=11  DSatur=11  Multi=10  Exact=10  (optimal, 50.1 ms)
+  N=80   WP=14  DSatur=14  Multi=14  Exact=14  (optimal, 50.2 ms)
+  N=100  WP=17  DSatur=17  Multi=17  Exact=17  (optimal, 50.2 ms)
+
+Files written to /mnt/user-data/outputs/ExamTimetable/sample_output:
+  timetable.csv, slots.txt, results.txt, report.html, benchmark.csv

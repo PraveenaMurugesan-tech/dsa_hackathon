@@ -1,0 +1,33 @@
+N,algorithm,slots,time_ms,proven_optimal
+10,Welsh-Powell,3,0.014,true
+10,DSatur,3,0.051,true
+10,DSatur multi-start,3,13.679,true
+10,Exact B&B,3,13.753,true
+20,Welsh-Powell,4,0.021,true
+20,DSatur,4,0.007,true
+20,DSatur multi-start,4,18.882,true
+20,Exact B&B,4,18.922,true
+30,Welsh-Powell,5,2.865,true
+30,DSatur,6,0.017,false
+30,DSatur multi-start,5,51.339,true
+30,Exact B&B,5,54.235,true
+40,Welsh-Powell,8,0.084,false
+40,DSatur,8,0.015,false
+40,DSatur multi-start,7,13.302,true
+40,Exact B&B,7,13.414,true
+50,Welsh-Powell,10,0.074,false
+50,DSatur,10,0.020,false
+50,DSatur multi-start,9,31.994,true
+50,Exact B&B,9,32.099,true
+60,Welsh-Powell,11,0.077,false
+60,DSatur,11,0.025,false
+60,DSatur multi-start,10,50.016,true
+60,Exact B&B,10,50.135,true
+80,Welsh-Powell,14,0.133,true
+80,DSatur,14,0.078,true
+80,DSatur multi-start,14,50.020,true
+80,Exact B&B,14,50.250,true
+100,Welsh-Powell,17,0.111,true
+100,DSatur,17,0.056,true
+100,DSatur multi-start,17,50.005,true
+100,Exact B&B,17,50.189,true
