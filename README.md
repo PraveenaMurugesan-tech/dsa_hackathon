@@ -93,7 +93,7 @@ Problem implementations, tests, and relevant visualizations are organized in the
 
 - Multiple algorithmic approaches
 - Time and space complexity analysis
-- Corner-case handling and correctness verification
+- Corner-case handling and correctness
 - Performance benchmarking
 - Algorithm visualizations
 - Comparative analysis of solutions
