@@ -77,7 +77,6 @@ Schedule exams without conflicts while respecting hall capacity, using greedy gr
 - Java
 - Git and GitHub
 - Matplotlib and NetworkX
-- CSV for data input and output
 
 ## Repository Structure
 
